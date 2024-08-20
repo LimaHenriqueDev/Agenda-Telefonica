@@ -8,10 +8,14 @@
     @vite('resources/css/app.css')
     @vite('resources/js/app.js')
 
+    <style>
+        .layout-page{
+            flex-grow: 1;
+        }
+    </style>
 </head>
 <body>
-    <div id="app"></div>
-
+    <div class="layout-page" id="app"></div>
 
 </body>
 </html>

@@ -20,7 +20,7 @@ class ContactService
       'phone' => $payload['phone'],
       'email' => $payload['email'],
       'user_id' => auth()->user()->id,
-      'image_id' => $image->id,
+      'image_id' => $image->id ?? null,
     ];
 
     return  $this->contactRepository->create($contactData);
@@ -28,7 +28,7 @@ class ContactService
 
   public function listContacts()
   {
-    return $this->contactRepository->getModel()->where('user_id', auth()->user()->id )->paginate(10);
+    return $this->contactRepository->getModel()->where('user_id', auth()->user()->id )->paginate(5);
   }
 
   public function showContact(int $id)
