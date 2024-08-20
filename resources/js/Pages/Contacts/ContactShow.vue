@@ -9,7 +9,9 @@
               <div class="p-3">
                 <img v-if="contact.image" :src="`/storage/${contact.image.path}`" alt="Imagem do Contato"
                   class="img-fluid fixed-size-image rounded" />
-                <p v-else class="">Nenhuma imagem disponível</p>
+                <div v-else>
+                  <img src="/storage/app/public/pexels-pixabay-47319.jpg" class="img-fluid fixed-size-image" alt="">
+                </div>
               </div>
               <div class=" p-2 text_sm_start">
                 <div class="mb-3 d-flex text-break-sm">
@@ -72,8 +74,6 @@ onMounted(async () => {
   overflow-wrap: break-word;
 }
 
-
-
 @media (max-width: 767.98px) {
   .text-break-sm {
     word-wrap: break-word;
@@ -89,13 +89,11 @@ onMounted(async () => {
     width: 100%;
   }
 
-
-
 }
 
 .fixed-size-image {
   width: 400px;
-  height: 400px;
-  border-radius: 50%;
+  height: 300px;
+  border-radius: 5%;
 }
 </style>
