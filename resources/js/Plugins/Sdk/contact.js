@@ -1,8 +1,8 @@
 import api from "./index.js";
 
 
-async function list() {
-    return await api.get(`/api/contacts`);
+async function list(query = '') {
+    return (await api.get(`/api/contacts${query}`)).data;
 }
 
 
