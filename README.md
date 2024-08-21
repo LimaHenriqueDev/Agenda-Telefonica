@@ -39,7 +39,9 @@ php artisan migrate
 
 
 php artisan db:seed
-Senha para todos users seed é: password
+senha para acesso de todos os usuarios seed é password
+Inicie o servidor de desenvolvimento:
+
 
 php artisan serve
 Agora, você pode acessar a aplicação em http://localhost:8000.
