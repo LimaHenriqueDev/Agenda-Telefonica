@@ -46,6 +46,8 @@ Inicie o servidor de desenvolvimento:
 php artisan serve
 Agora, você pode acessar a aplicação em http://localhost:8000.
 
+php artisan storage:link
+
 Assista à Demonstração
 Confira a demonstração completa da aplicação no YouTube: https://youtu.be/wMLqsHOE1VU
 YouTube - Agenda Telefônica
