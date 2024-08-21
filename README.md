@@ -12,47 +12,39 @@ Siga os passos abaixo para instalar e configurar o projeto:
 
 Clone o repositório:
 
-bash
-Copiar código
+
 git clone https://github.com/seu-usuario/agenda-telefonica.git
 cd agenda-telefonica
 Instale as dependências do PHP com o Composer:
 
-bash
-Copiar código
+
 composer install
 Instale as dependências do Node.js com o npm:
 
-bash
-Copiar código
+
 npm install
 Copie o arquivo .env.example para .env e configure suas variáveis de ambiente:
 
-bash
-Copiar código
+
 cp .env.example .env
 Gere a chave da aplicação:
 
-bash
-Copiar código
+
 php artisan key:generate
 Execute as migrações do banco de dados:
 
-bash
-Copiar código
+
 php artisan migrate
 (Opcional) Popule o banco de dados com dados iniciais:
 
-bash
-Copiar código
+
 php artisan db:seed
 Inicie o servidor de desenvolvimento:
 
-bash
-Copiar código
+
 php artisan serve
 Agora, você pode acessar a aplicação em http://localhost:8000.
 
 Assista à Demonstração
-Confira a demonstração completa da aplicação no YouTube:
+Confira a demonstração completa da aplicação no YouTube: https://youtu.be/wMLqsHOE1VU
 YouTube - Agenda Telefônica
