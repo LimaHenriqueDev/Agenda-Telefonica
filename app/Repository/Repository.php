@@ -40,5 +40,4 @@ class Repository
     {
         return $this->model->destroy($id);
     }
-
 }

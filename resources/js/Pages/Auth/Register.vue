@@ -1,7 +1,7 @@
 <template>
     <div class="container vh-100 d-flex">
         <div
-            class="login_bg container d-flex justify-content-center align-items-center m-auto p-3 col-lg-6"
+            class="register-bg container d-flex justify-content-center align-items-center m-auto p-3 col-lg-6"
         >
             <div class="col-lg-6">
                 <div class="col-lg-12 d-flex mt-4">
@@ -11,11 +11,20 @@
                         style="height: 200px"
                     />
                 </div>
-                <h1 class="text-center mt-3">Entrar</h1>
-                <div class="text-center mb-4">
-                    <p>Acesse sua Agenda telefônica</p>
-                </div>
+                <h1 class="text-center mt-3">Cadastre-se</h1>
 
+                <div class="mb-3">
+                    <label for="name" class="form-label">Nome</label>
+                    <input
+                        v-model="payload.name"
+                        id="name"
+                        class="form-control"
+                        :class="{
+                            'is-invalid': !payload.name && formSubmited,
+                        }"
+                        type="name"
+                    />
+                </div>
                 <div class="mb-3">
                     <label for="email" class="form-label">Email</label>
                     <input
@@ -23,7 +32,7 @@
                         id="email"
                         class="form-control"
                         :class="{
-                            'is-invalid': !payload.email && formSubmitted,
+                            'is-invalid': !payload.email && formSubmited,
                         }"
                         type="email"
                     />
@@ -34,7 +43,7 @@
                         type="password"
                         class="form-control"
                         :class="{
-                            'is-invalid': !payload.password && formSubmitted,
+                            'is-invalid': !payload.password && formSubmited,
                         }"
                         id="password"
                         v-model="payload.password"
@@ -44,19 +53,10 @@
                 <div class="text-center">
                     <button
                         class="btn btn-primary btn rounded mt-3 mb-4 w-100"
-                        @click="() => login()"
+                        @click="() => submitForm()"
                     >
-                        Entrar
+                        Cadastrar
                     </button>
-                    <div>
-                        <router-link
-                            :to="{ name: 'Register' }"
-                            class="btn btn-success"
-                        >
-                           Não tem conta? Cadastre-se aqui!
-                        </router-link>
-                    </div>
-                    
                 </div>
             </div>
         </div>
@@ -64,34 +64,42 @@
 </template>
 <script setup>
 import { ref } from "vue";
-import auth from "../../Plugins/Sdk/auth";
-import router from "../../Plugins/Router";
+import userApi from "../../Plugins/Sdk/user";
 import { toast } from "vue3-toastify";
+import router from "../../Plugins/Router";
+
 
 const payload = ref({
+    name: "",
     email: "",
     password: "",
 });
-const formSubmitted = ref(false);
 
-async function login() {
-    formSubmitted.value = true;
+const formSubmited = ref(false);
+
+async function submitForm() {
+    formSubmited.value = true;
+
+    if (
+        !payload.value.name ||
+        !payload.value.email ||
+        !payload.value.password
+    ) {
+        toast.error("Você não preencheu alguns campos obrigatórios.");
+        return;
+    }
+
     try {
-        if (!payload.value.email || !payload.value.password) {
-            toast.error("O campo e-mail e senha são obrigatórios!");
-            return;
-        }
+        await userApi.store(payload.value);
+        toast.success("Cadastro realizado com sucesso!");
+		setTimeout(() => router.push({ name: "Login" }), 1500);
 
-        await axios.get("/sanctum/csrf-cookie");
-        await auth.login(payload.value);
-        setTimeout(() => {
-            router.push({ name: "ContactIndex" });
-        }, 1000);
     } catch (error) {
-        toast.error("Email ou senha incorreto.");
+        toast.error("Erro ao enviar o formulário. Por favor, tente novamente.");
     }
 }
 </script>
+
 <style scoped>
 .title-shadow {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
@@ -107,10 +115,9 @@ async function login() {
     color: red !important;
 }
 
-.login_bg {
+.register-bg {
     background-color: rgba(255, 255, 255, 0.869);
     box-shadow: 8px 4px 9px rgba(228, 217, 217, 0.1);
-    /* X, Y, Blur, Spread, Color */
 }
 
 label,

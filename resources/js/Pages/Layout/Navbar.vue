@@ -45,34 +45,19 @@ async function logout(){
  router.push('/login')
 } 
 
-function onRemoved(cookie) {
-  console.log(`Removed: ${cookie}`);
-}
-
-function onError(error) {
-  console.log(`Error removing cookie: ${error}`);
-}
-
-function removeCookie(tabs) {
-  let removing = browser.cookies.remove({
-    url: tabs[0].url,
-    name: "XSRF-TOKEN",
-  });
-  removing.then(onRemoved, onError);
-}
-
 </script>
+
 <style scoped>
 .navbar {
   padding: 0 2rem;
 }
 
 .navbar-nav .nav-item {
-  margin: 0 0.5rem; /* Adiciona margem horizontal entre os itens do menu */
+  margin: 0 0.5rem;
 }
 
 .dropdown-menu {
-  min-width: 100px; /* Ajusta a largura mínima do menu dropdown */
+  min-width: 100px;
 }
 
 .navbar_size{

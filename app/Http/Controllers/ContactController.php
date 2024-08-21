@@ -24,12 +24,10 @@ class ContactController extends Controller
         }
     }
 
-
-
     public function store(StoreContactRequest $storeContactRequest)
     {
         try {
-            $image = null; 
+            $image = null;
             if ($storeContactRequest->hasFile('image')) {
                 $image = $this->imageService->saveImage($storeContactRequest->file('image'));
             }
@@ -51,7 +49,6 @@ class ContactController extends Controller
         }
     }
 
-
     public function update(UpdateContactRequest $updateContactRequest, Contact $contact)
     {
         try {
@@ -68,9 +65,6 @@ class ContactController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Contact $contact)
     {
         try {

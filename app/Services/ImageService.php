@@ -12,8 +12,7 @@ class ImageService
     public function saveImage(UploadedFile $image)
     {
         $path = Storage::put('images', $image);
-        
+
         return Image::create(['path' => $path]);
     }
 }
-

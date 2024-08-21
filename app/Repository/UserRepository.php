@@ -2,13 +2,13 @@
 
 namespace App\Repository;
 
-use App\Models\Contact;
+use App\Models\User;
 
-class ContactRepository extends Repository
+class UserRepository extends Repository
 {
     public function __construct()
     {
-        parent::__construct(new Contact());
+        parent::__construct(new User());
     }
 
     public function getModel()

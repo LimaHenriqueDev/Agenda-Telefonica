@@ -1,15 +1,13 @@
 <template>
-  <router-view />
+    <router-view />
 </template>
 
-<script setup>
+<script setup></script>
 
-</script>
 <style>
 html,
 body {
-  height: 100%;
-  margin: 0;
-
+    height: 100%;
+    margin: 0;
 }
 </style>

@@ -8,7 +8,6 @@ use App\Models\Image;
 use App\Repository\ContactRepository;
 
 class ContactService
-//organizar ordem como controller
 {
   public function __construct(private ContactRepository $contactRepository) {}
 
@@ -28,7 +27,7 @@ class ContactService
 
   public function listContacts()
   {
-    return $this->contactRepository->getModel()->where('user_id', auth()->user()->id )->paginate(5);
+    return $this->contactRepository->getModel()->where('user_id', auth()->user()->id)->paginate(5);
   }
 
   public function showContact(int $id)

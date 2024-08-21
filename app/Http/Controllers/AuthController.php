@@ -18,11 +18,12 @@ class AuthController extends Controller
             return response('Autenticação realizada com sucesso');
         }
 
-        return response("The provided credentials do not match our records.", 401);
+        return response("As credencias não batem com nossos registros.", 401);
     }
 
-    public function isLoged(){
-        return response()->json(null,204);
+    public function isLoged()
+    {
+        return response()->json(null, 204);
     }
 
     public function logOut(Request $request)
@@ -30,6 +31,6 @@ class AuthController extends Controller
         $user = $request->user();
         $user->tokens()->delete();
         $request->session()->invalidate();
-        return response()->json(['message' => 'Logged out successfully'], 200);
+        return response()->json(['message' => 'saiu com sucesso'], 200);
     }
 }

@@ -2,6 +2,7 @@ import { createWebHistory, createRouter } from "vue-router";
 
 import Home from "../../home.vue";
 import Login from "../../Pages/Auth/Login.vue";
+import Register from "../../Pages/Auth/Register.vue";
 import ContactForm from "../../Pages/Contacts/ContactForm.vue";
 import ContactShow from "../../Pages/Contacts/ContactShow.vue";
 import ContactList from "../../Pages/Contacts/ContactList.vue";
@@ -33,7 +34,11 @@ const routes = [
             },
         ],
     },
-    { path: "/login", component: Login },
+    { path: "/login",
+         component: Login,
+         name:'Login', },
+    { path: "/register", component: Register, name: "Register" },
+
 ];
 
 const router = createRouter({
@@ -44,14 +49,14 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
     if (to.matched.some((record) => record.meta.requiresAuth)) {
         try {
-            await auth.isLoged(); 
+            await auth.isLoged();
 
             next();
         } catch (error) {
             next("/login");
         }
     } else {
-        next(); 
+        next();
     }
 });
 
