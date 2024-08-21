@@ -13,7 +13,7 @@ Siga os passos abaixo para instalar e configurar o projeto:
 Clone o repositório:
 
 
-git clone https://github.com/seu-usuario/agenda-telefonica.git
+git clone https://github.com/LimaHenriqueDev/Agenda-Telefonica
 cd agenda-telefonica
 Instale as dependências do PHP com o Composer:
 
@@ -39,8 +39,7 @@ php artisan migrate
 
 
 php artisan db:seed
-Inicie o servidor de desenvolvimento:
-
+Senha para todos users seed é: password
 
 php artisan serve
 Agora, você pode acessar a aplicação em http://localhost:8000.
