@@ -39,6 +39,7 @@ php artisan migrate
 
 
 php artisan db:seed
+senha para acesso de todos os usuarios seed é password
 Inicie o servidor de desenvolvimento:
 
 
