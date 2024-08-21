@@ -62,7 +62,7 @@
 
                         <div v-else>
                             <img
-                                src="/storage/app/public/Default-Image.jpg"
+                                src="/public/Default-Image.jpg"
                                 class="img-fluid fixed-size-image"
                                 alt=""
                             />

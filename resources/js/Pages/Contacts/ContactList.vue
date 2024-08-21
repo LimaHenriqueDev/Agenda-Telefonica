@@ -52,7 +52,7 @@
                                     />
                                     <div v-else>
                                         <img
-                                            src="/storage/app/public/Default-Image.jpg"
+                                            src="/public/Default-Image.jpg"
                                             class="rounded-circle"
                                             style="
                                                 max-width: 38px;

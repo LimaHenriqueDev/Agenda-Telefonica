@@ -6,7 +6,7 @@
             <div class="col-lg-6">
                 <div class="col-lg-12 d-flex mt-4">
                     <img
-                        src="/storage/app/public/Default-Image-2.jpg"
+                        src="/public/Default-Image-2.jpg"
                         class="img-fluid mx-auto rounded"
                         style="height: 200px"
                     />
