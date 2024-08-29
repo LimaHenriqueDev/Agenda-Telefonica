@@ -2,23 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\LoginRequest;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 
-//to do: criar request
 class AuthController extends Controller
 {
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        $credentials = $request->all();
+        $credentials = $request->validated();
 
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-
-            return response('Autenticação realizada com sucesso');
+        if (!Auth::attempt($credentials)) {
+            return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
-        return response("As credencias não batem com nossos registros.", 401);
+        $request->session()->regenerate();
+
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 
     public function isLoged()

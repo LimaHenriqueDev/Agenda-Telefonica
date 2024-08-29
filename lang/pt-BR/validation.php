@@ -39,7 +39,7 @@ return [
     'max' => [
         'numeric' => 'O :attribute não pode ser maior que :max.',
         'file' => 'O :attribute não pode ser maior que :max kilobytes.',
-        'string' => 'O :attribute não pode ser maior que :max caracteres.',
+        'string' => 'A :attribute não pode ser maior que :max caracteres.',
         'array' => 'O :attribute não pode ter mais que :max itens.',
     ],
     'mimes' => 'O :attribute deve ser um arquivo do tipo: :values.',
@@ -87,5 +87,6 @@ return [
         'phone' => 'telefone',
         'email' => 'e-mail',
         'image' => 'imagem',
+        'password' => 'senha',
     ],
 ];

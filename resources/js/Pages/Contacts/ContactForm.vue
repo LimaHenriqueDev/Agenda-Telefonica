@@ -1,57 +1,51 @@
 <template>
     <div
-        class="container d-flex justify-content-center align-items-center"
-        style="min-height: calc(100vh - 144px)"
+        class="main-container container d-flex justify-content-center align-items-center"
     >
         <div class="card border-0">
             <div class="card-body">
                 <form @submit.prevent="submitForm">
                     <h1 class="text-center">{{ title }}</h1>
-                    <div class="mb-3">
-                        <label for="name" class="form-label">Nome:</label>
-                        <input
-                            v-model="payload.name"
-                            id="name"
-                            class="form-control"
-                            :class="{
-                                'is-invalid': !payload.name && formSubmitted,
-                            }"
-                            type="text"
-                        />
-                    </div>
 
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email:</label>
-                        <input
-                            v-model="payload.email"
-                            id="email"
-                            class="form-control"
-                            :class="{
-                                'is-invalid': !payload.email && formSubmitted,
-                            }"
-                            type="email"
-                        />
-                    </div>
+                    <AppInput
+                        v-model="payload.name"
+                        label="Nome"
+                        placeholder="Nome de usuário"
+                        id="name"
+                        type="name"
+                        :error="
+                            v$.name.$error ? v$.name.$errors[0].$message : ''
+                        "
+                    />
 
-                    <div class="mb-3">
-                        <label for="telefone" class="form-label"
-                            >Telefone:</label
-                        >
-                        <input
-                            v-model="payload.phone"
-                            id="telefone"
-                            class="form-control"
-                            :class="{
-                                'is-invalid': !payload.phone && formSubmitted,
-                            }"
-                            v-mask="'(###) ###-####'"
-                            type="tel"
-                            @input="validatePhone"
-                        />
-                    </div>
-                    <label v-if="contact.image" for="" class="form-label"
-                        >Imagem:</label
-                    >
+                    <AppInput
+                        v-model="payload.email"
+                        label="Email"
+                        placeholder="seuemail@gmail.com"
+                        id="email"
+                        type="email"
+                        :error="
+                            v$.email.$error ? v$.email.$errors[0].$message : ''
+                        "
+                    />
+
+                    <AppInput
+                        v-model="payload.phone"
+                        label="Telefone"
+                        placeholder="(00) 00000-0000"
+                        id="phone"
+                        type="tel"
+                        v-mask="'(##) #####-####'"
+                        :error="
+                            v$.phone.$error ? v$.phone.$errors[0].$message : ''
+                        "
+                    />
+
+                    <label
+                        v-if="contact.image"
+                        for=""
+                        class="form-label"
+                    ></label>
                     <div class="p-3 text-center">
                         <img
                             v-if="contact.image"
@@ -70,7 +64,9 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="image" class="form-label">Imagem</label>
+                        <label for="image" class="form-label"
+                            >Escolha uma imagem:</label
+                        >
                         <input
                             class="form-control"
                             accept="image/png, image/jpg, image/jpeg"
@@ -100,10 +96,24 @@ import contactApi from "../../Plugins/Sdk/contact";
 import { useRoute } from "vue-router";
 import router from "../../Plugins/Router";
 import { toast } from "vue3-toastify";
+import { useVuelidate } from "@vuelidate/core";
+import AppInput from "../../Components/Form/AppInput.vue";
+import validator from "./../../Utils/validator";
+import { AxiosError } from "axios";
 
-const title = computed(() =>
-    payload.value.id ? "Editar Contato" : "Cadastrar Contato"
-);
+const rules = computed(() => ({
+    name: {
+        required: validator.required,
+    },
+    email: {
+        required: validator.required,
+        email: validator.email,
+    },
+    phone: {
+        required: validator.required,
+    },
+}));
+
 const payload = ref({
     name: "",
     email: "",
@@ -112,6 +122,12 @@ const payload = ref({
     image: null,
 });
 
+const v$ = useVuelidate(rules, payload);
+
+const title = computed(() =>
+    payload.value.id ? "Editar Contato" : "Cadastrar Contato"
+);
+
 const route = useRoute();
 const contact = ref([]);
 const formSubmitted = ref(false);
@@ -119,12 +135,11 @@ const formSubmitted = ref(false);
 async function submitForm() {
     formSubmitted.value = true;
 
-    if (!payload.value.name || !payload.value.email || !payload.value.phone) {
-        toast.error("Você não preencheu alguns campos obrigatórios.");
-        return;
-    }
-
     try {
+        await v$.value.$validate();
+        if (v$.value.$invalid) {
+            return;
+        }
         if (payload.value.id) {
             await contactApi.update(payload.value, payload.value.id);
             toast.success("Contato atualizado com sucesso!");
@@ -135,6 +150,15 @@ async function submitForm() {
             setTimeout(() => router.push({ name: "ContactIndex" }), 1500);
         }
     } catch (error) {
+        if (
+            (error.response &&
+                error.response.status === 409 &&
+                error.response.data.message.includes("email")) ||
+            error.response.data.message.includes("e-mail")
+        ) {
+            toast.error("Email de contato já está cadastrado.");
+            return;
+        }
         toast.error("Erro ao enviar o formulário. Por favor, tente novamente.");
     }
 }
@@ -162,10 +186,6 @@ const buttonDisable = ref(false);
 function handleFileUpload(event) {
     payload.value.image = event.target.files[0];
 }
-
-function validatePhone(event) {
-    payload.value.phone = event.target.value.replace(/\D/g, "");
-}
 </script>
 <style scoped>
 h1 {
@@ -173,12 +193,12 @@ h1 {
 }
 
 .is-invalid {
-    border-color: red !important;
+    border-color: #e57373 !important;
     background-color: #f8d7da !important;
 }
 
 .is-invalid .form-label {
-    color: red !important;
+    color: #e57373 !important;
 }
 
 .contact-image {
@@ -193,5 +213,9 @@ h1 {
     /* Defina a altura desejada */
     object-fit: cover;
     border-radius: 5%;
+}
+
+.main-container {
+    min-height: calc(100vh - 144px);
 }
 </style>

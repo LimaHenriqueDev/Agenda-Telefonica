@@ -61,4 +61,11 @@ class ContactService
 
     $this->contactRepository->update($id, $contactData);
   }
+
+  
+  public function checkIfContactEmailExists($email){
+    return  $this->contactRepository->checkIfContactEmailExists($email);
+  }
+  
+ 
 }

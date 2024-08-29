@@ -69,7 +69,9 @@
                                 <td class="align-middle">
                                     {{ contact.email }}
                                 </td>
-                                <td>
+                                <td
+                                    class="d-flex justify-content-center align-middle"
+                                >
                                     <router-link
                                         :to="{
                                             name: 'ContactEdit',
@@ -96,6 +98,12 @@
                                             class="fas fa-trash-alt text-danger"
                                         ></i>
                                     </button>
+                                </td>
+                            </tr>
+                            <tr v-if="contacts.data.length === 0">
+                                <td colspan="5" class="text-center">
+                                    Você ainda não possui nenhum contato
+                                    cadastrado
                                 </td>
                             </tr>
                         </tbody>

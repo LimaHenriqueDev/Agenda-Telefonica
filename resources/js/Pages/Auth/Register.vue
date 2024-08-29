@@ -1,118 +1,143 @@
 <template>
-    <div class="container vh-100 d-flex">
+    <div
+        class="container vh-100 d-flex justify-content-center align-items-center"
+    >
         <div
-            class="register-bg container d-flex justify-content-center align-items-center m-auto p-3 col-lg-6"
+            class="register-bg container d-flex justify-content-center align-items-center m-auto p-3 col-lg-6 col-md-8"
         >
-            <div class="col-lg-6">
+            <div class="col-lg-6 col-md-8">
                 <div class="col-lg-12 d-flex mt-4">
                     <img
                         src="/public/Default-Image-2.jpg"
-                        class="img-fluid mx-auto rounded"
-                        style="height: 200px"
+                        class="img-fluid mx-auto rounded shadow register-img"
                     />
                 </div>
                 <h1 class="text-center mt-3">Cadastre-se</h1>
-
-                <div class="mb-3">
-                    <label for="name" class="form-label">Nome</label>
-                    <input
+                <form>
+                    <AppInput
                         v-model="payload.name"
+                        label="Nome"
+                        placeholder="Nome de usuário"
                         id="name"
-                        class="form-control"
-                        :class="{
-                            'is-invalid': !payload.name && formSubmited,
-                        }"
                         type="name"
+                        :error="
+                            v$.name.$error ? v$.name.$errors[0].$message : ''
+                        "
                     />
-                </div>
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
-                    <input
+                    <AppInput
                         v-model="payload.email"
+                        label="Email"
+                        placeholder="seuemail@gmail.com"
                         id="email"
-                        class="form-control"
-                        :class="{
-                            'is-invalid': !payload.email && formSubmited,
-                        }"
                         type="email"
+                        :error="
+                            v$.email.$error ? v$.email.$errors[0].$message : ''
+                        "
                     />
-                </div>
-                <div class="mb-3">
-                    <label for="password" class="form-label">Senha </label>
-                    <input
-                        type="password"
-                        class="form-control"
-                        :class="{
-                            'is-invalid': !payload.password && formSubmited,
-                        }"
-                        id="password"
+                    <AppInput
                         v-model="payload.password"
-                        required
+                        label="Senha"
+                        placeholder="********"
+                        id="password"
+                        type="password"
+                        :error="
+                            v$.password.$error
+                                ? v$.password.$errors[0].$message
+                                : ''
+                        "
                     />
-                </div>
-                <div class="text-center">
-                    <button
-                        class="btn btn-primary btn rounded mt-3 mb-4 w-100"
-                        @click="() => submitForm()"
-                    >
-                        Cadastrar
-                    </button>
-                </div>
+
+                    <div class="text-center">
+                        <button
+                            :disabled="v$.$invalid || submitFormCheck"
+                            class="register-btn btn btn-primary btn rounded mt-3 mb-4 w-100 shadow"
+                            @click.prevent="() => submitForm()"
+                        >
+                            Cadastrar
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 </template>
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import userApi from "../../Plugins/Sdk/user";
 import { toast } from "vue3-toastify";
 import router from "../../Plugins/Router";
+import AppInput from "../../Components/Form/AppInput.vue";
+import validator from "./../../Utils/validator";
+import { useVuelidate } from "@vuelidate/core";
 
-
+const rules = computed(() => ({
+    name: {
+        required: validator.required,
+    },
+    email: {
+        required: validator.required,
+        email: validator.email,
+    },
+    password: {
+        required: validator.required,
+        minLength: validator.minLength(6),
+    },
+}));
 const payload = ref({
     name: "",
     email: "",
     password: "",
 });
 
-const formSubmited = ref(false);
+const v$ = useVuelidate(rules, payload);
+
+const submitFormCheck = ref(false);
 
 async function submitForm() {
-    formSubmited.value = true;
-
-    if (
-        !payload.value.name ||
-        !payload.value.email ||
-        !payload.value.password
-    ) {
-        toast.error("Você não preencheu alguns campos obrigatórios.");
-        return;
-    }
-
     try {
+        submitFormCheck.value = true;
+        await v$.value.$validate();
+        if (v$.value.$invalid) {
+            return;
+        }
         await userApi.store(payload.value);
         toast.success("Cadastro realizado com sucesso!");
-		setTimeout(() => router.push({ name: "Login" }), 1500);
-
+        setTimeout(() => router.push({ name: "Login" }), 1500);
     } catch (error) {
-        toast.error("Erro ao enviar o formulário. Por favor, tente novamente.");
+        submitFormCheck.value = false;
+        if (error instanceof AxiosError) {
+            if (error.response.status === 401) {
+                return toast.error("Email ou senha incorreto.");
+            }
+            if (error.response.status === 401) {
+                return toast.error(
+                    "O nome de usuário informado já está cadastrado."
+                );
+            }
+            if (
+                error.response &&
+                error.response.status === 422 &&
+                error.response.data.message.includes("caracteres")
+            ) {
+                toast.error("Email não pode ser maior que 35 caracteres.");
+                return;
+            }
+            toast.error(
+                "Erro ao enviar o formulário. Por favor, tente novamente."
+            );
+        }
     }
 }
 </script>
 
 <style scoped>
-.title-shadow {
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    font-weight: 700;
-}
-
 .is-invalid {
-    border-color: red !important;
+    border-color: #e57373 !important;
     background-color: #f8d7da !important;
 }
 
 .is-invalid .form-label {
-    color: red !important;
+    color: #e57373 !important;
 }
 
 .register-bg {
@@ -120,8 +145,34 @@ async function submitForm() {
     box-shadow: 8px 4px 9px rgba(228, 217, 217, 0.1);
 }
 
+.register-img {
+    height: 200px;
+    border: 2px solid #ddd;
+}
+
+.register-btn {
+    font-size: 1.2rem;
+    transition: background-color 0.3s;
+}
+
 label,
 h1 {
-    color: #000000;
+    color: #333333;
+}
+
+h1.text-center::before,
+h1.text-center::after {
+    content: "";
+    flex: 1;
+    border-bottom: 1px solid #333333;
+    margin: auto 16px;
+}
+
+h1.text-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: #333333;
 }
 </style>

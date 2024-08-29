@@ -7,7 +7,7 @@
                 <div class="col-lg-12 d-flex mt-4">
                     <img
                         src="/public/Default-Image-2.jpg"
-                        class="img-fluid mx-auto rounded"
+                        class="register-img img-fluid mx-auto rounded"
                         style="height: 200px"
                     />
                 </div>
@@ -15,49 +15,49 @@
                 <div class="text-center mb-4">
                     <p>Acesse sua Agenda telefônica</p>
                 </div>
-
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
-                    <input
+                <form>
+                    <AppInput
                         v-model="payload.email"
+                        label="Email"
+                        placeholder="seuemail@gmail.com"
                         id="email"
-                        class="form-control"
-                        :class="{
-                            'is-invalid': !payload.email && formSubmitted,
-                        }"
                         type="email"
+                        :error="
+                            v$.email.$error ? v$.email.$errors[0].$message : ''
+                        "
                     />
-                </div>
-                <div class="mb-3">
-                    <label for="password" class="form-label">Senha </label>
-                    <input
-                        type="password"
-                        class="form-control"
-                        :class="{
-                            'is-invalid': !payload.password && formSubmitted,
-                        }"
-                        id="password"
+                    <AppInput
                         v-model="payload.password"
-                        required
+                        label="Senha"
+                        placeholder="********"
+                        id="password"
+                        type="password"
+                        :error="
+                            v$.password.$error
+                                ? v$.password.$errors[0].$message
+                                : errors['password']
+                                ? errors['password'][0]
+                                : ''
+                        "
                     />
-                </div>
-                <div class="text-center">
-                    <button
-                        class="btn btn-primary btn rounded mt-3 mb-4 w-100"
-                        @click="() => login()"
-                    >
-                        Entrar
-                    </button>
-                    <div>
-                        <router-link
-                            :to="{ name: 'Register' }"
-                            class="btn btn-success"
+                    <div class="text-center">
+                        <button
+                            :disabled="v$.$invalid || submitForm"
+                            class="login-btn btn btn-primary btn rounded mt-3 mb-4 w-100"
+                            @click.prevent="() => login()"
                         >
-                           Não tem conta? Cadastre-se aqui!
-                        </router-link>
+                            Entrar
+                        </button>
+                        <div>
+                            <router-link
+                                :to="{ name: 'Register' }"
+                                class="register-btn btn btn-success mt-1 mb-4 w-100"
+                            >
+                                Criar uma conta!
+                            </router-link>
+                        </div>
                     </div>
-                    
-                </div>
+                </form>
             </div>
         </div>
     </div>
@@ -67,28 +67,62 @@ import { ref } from "vue";
 import auth from "../../Plugins/Sdk/auth";
 import router from "../../Plugins/Router";
 import { toast } from "vue3-toastify";
+import { useVuelidate } from "@vuelidate/core";
+import { computed } from "vue";
+import AppInput from "../../Components/Form/AppInput.vue";
+import validator from "./../../Utils/validator";
+import { AxiosError } from "axios";
+
+const submitForm = ref(false);
+const errors = ref([]);
+
+const rules = computed(() => ({
+    email: {
+        required: validator.required,
+        maxLength: validator.maxLength(100),
+    },
+    password: {
+        required: validator.required,
+        minLength: validator.minLength(6),
+    },
+}));
 
 const payload = ref({
     email: "",
     password: "",
 });
-const formSubmitted = ref(false);
+
+const v$ = useVuelidate(rules, payload);
 
 async function login() {
-    formSubmitted.value = true;
     try {
-        if (!payload.value.email || !payload.value.password) {
-            toast.error("O campo e-mail e senha são obrigatórios!");
+        submitForm.value = true;
+        await v$.value.$validate();
+        if (v$.value.$invalid) {
             return;
         }
 
         await axios.get("/sanctum/csrf-cookie");
         await auth.login(payload.value);
-        setTimeout(() => {
-            router.push({ name: "ContactIndex" });
-        }, 1000);
+        router.push({ name: "ContactIndex" });
+
+        setTimeout(() => toast.success("Login realizado com sucesso!"), 500);
     } catch (error) {
-        toast.error("Email ou senha incorreto.");
+        submitForm.value = false;
+        if (error instanceof AxiosError) {
+            if (error.response.status === 401) {
+                return toast.error("Email ou senha incorreto.");
+            }
+
+            if (error.response.status === 422) {
+                errors.value = error.response.data.errors;
+                return toast.error("Valide os campos do formulário.");
+            }
+        }
+
+        toast.error(
+            "Não foi possível realizar a operação tente novamente mais tarde"
+        );
     }
 }
 </script>
@@ -110,11 +144,40 @@ async function login() {
 .login_bg {
     background-color: rgba(255, 255, 255, 0.869);
     box-shadow: 8px 4px 9px rgba(228, 217, 217, 0.1);
-    /* X, Y, Blur, Spread, Color */
 }
 
 label,
 h1 {
     color: #000000;
+}
+
+h1.text-center::before,
+h1.text-center::after {
+    content: "";
+    flex: 1;
+    border-bottom: 1px solid #333333;
+    margin: auto 16px;
+}
+
+h1.text-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #333333;
+}
+
+.register-img {
+    height: 200px;
+    border: 2px solid #ddd;
+}
+
+.login-btn {
+    font-size: 1.2rem;
+    transition: background-color 0.3s;
+}
+
+.register-btn {
+    font-size: 1rem;
+    transition: background-color 0.3s;
 }
 </style>
