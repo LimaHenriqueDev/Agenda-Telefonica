@@ -10,7 +10,7 @@
                     <AppInput
                         v-model="payload.name"
                         label="Nome"
-                        placeholder="Nome de usuário"
+                        placeholder="Nome do contato"
                         id="name"
                         type="name"
                         :error="
@@ -25,7 +25,11 @@
                         id="email"
                         type="email"
                         :error="
-                            v$.email.$error ? v$.email.$errors[0].$message : ''
+                            v$.email.$error
+                                ? v$.email.$errors[0].$message
+                                : errors['email']
+                                ? errors['email'][0]
+                                : ''
                         "
                     />
 
@@ -107,6 +111,7 @@ const rules = computed(() => ({
     },
     email: {
         required: validator.required,
+        maxLength: validator.maxLength(100),
         email: validator.email,
     },
     phone: {
@@ -131,7 +136,7 @@ const title = computed(() =>
 const route = useRoute();
 const contact = ref([]);
 const formSubmitted = ref(false);
-
+const errors = ref([]);
 async function submitForm() {
     formSubmitted.value = true;
 
@@ -150,15 +155,13 @@ async function submitForm() {
             setTimeout(() => router.push({ name: "ContactIndex" }), 1500);
         }
     } catch (error) {
-        if (
-            (error.response &&
-                error.response.status === 409 &&
-                error.response.data.message.includes("email")) ||
-            error.response.data.message.includes("e-mail")
-        ) {
-            toast.error("Email de contato já está cadastrado.");
-            return;
+        if (error instanceof AxiosError) {
+            if (error.response.status === 422) {
+                errors.value = error.response.data.errors;
+                return;
+            }
         }
+
         toast.error("Erro ao enviar o formulário. Por favor, tente novamente.");
     }
 }
@@ -210,7 +213,6 @@ h1 {
 .fixed-size-image {
     width: 400px;
     height: 200px;
-    /* Defina a altura desejada */
     object-fit: cover;
     border-radius: 5%;
 }

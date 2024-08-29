@@ -31,7 +31,11 @@
                         id="email"
                         type="email"
                         :error="
-                            v$.email.$error ? v$.email.$errors[0].$message : ''
+                            v$.password.$error
+                                ? v$.password.$errors[0].$message
+                                : errors['email']
+                                ? errors['email'][0]
+                                : ''
                         "
                     />
                     <AppInput
@@ -69,6 +73,9 @@ import router from "../../Plugins/Router";
 import AppInput from "../../Components/Form/AppInput.vue";
 import validator from "./../../Utils/validator";
 import { useVuelidate } from "@vuelidate/core";
+import { AxiosError } from "axios";
+
+const errors = ref([]);
 
 const rules = computed(() => ({
     name: {
@@ -76,6 +83,7 @@ const rules = computed(() => ({
     },
     email: {
         required: validator.required,
+        maxLength: validator.maxLength(100),
         email: validator.email,
     },
     password: {
@@ -106,22 +114,11 @@ async function submitForm() {
     } catch (error) {
         submitFormCheck.value = false;
         if (error instanceof AxiosError) {
-            if (error.response.status === 401) {
-                return toast.error("Email ou senha incorreto.");
-            }
-            if (error.response.status === 401) {
-                return toast.error(
-                    "O nome de usuário informado já está cadastrado."
-                );
-            }
-            if (
-                error.response &&
-                error.response.status === 422 &&
-                error.response.data.message.includes("caracteres")
-            ) {
-                toast.error("Email não pode ser maior que 35 caracteres.");
+            if (error.response.status === 422) {
+                errors.value = error.response.data.errors;
                 return;
             }
+
             toast.error(
                 "Erro ao enviar o formulário. Por favor, tente novamente."
             );

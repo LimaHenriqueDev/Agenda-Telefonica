@@ -15,9 +15,4 @@ class ContactRepository extends Repository
     {
         return $this->model;
     }
-
-    public function checkIfContactEmailExists(string $email){
-        return $this->model->where('email',$email)->first();
-    }
-
 }

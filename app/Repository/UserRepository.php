@@ -15,13 +15,4 @@ class UserRepository extends Repository
     {
         return $this->model;
     }
-
-    public function checkIfUserEmailExists(string $email){
-        return $this->model->where('email',$email)->first();
-    }
-
-    
-    public function checkIfUserNameExists(string $name){
-        return $this->model->where('name',$name)->first();
-    }
 }

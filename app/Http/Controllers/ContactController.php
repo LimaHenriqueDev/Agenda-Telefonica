@@ -33,16 +33,10 @@ class ContactController extends Controller
                 $image = $this->imageService->saveImage($storeContactRequest->file('image'));
             }
 
-            $emailExists = $this->contactService->checkIfContactEmailExists($storeContactRequest['email']);
-
-            if ($emailExists) {
-                throw new EmailAlreadyExistsException('O email informado já está cadastrado!');
-            }
-
             $contact = $this->contactService->createContact($storeContactRequest->validated(), $image);
 
             return response()->json($contact, 201);
-        }catch (EmailAlreadyExistsException $e) {
+        } catch (EmailAlreadyExistsException $e) {
             return response()->json(['message' => $e->getMessage()], 409);
         } catch (\Exception $e) {
             return $this->apiError($e);
@@ -65,17 +59,11 @@ class ContactController extends Controller
             if ($updateContactRequest->hasFile('image')) {
                 $image = $this->imageService->saveImage($updateContactRequest->file('image'));
             }
-            $currentEmail = $contact->email;
-            $newEmail = $updateContactRequest['email'];
-    
-            if ($newEmail !== $currentEmail && $this->contactService->checkIfContactEmailExists($newEmail)) {
-                throw new EmailAlreadyExistsException('O email informado já está cadastrado!');
-            }
 
             $this->contactService->updateContact($contact->id, $updateContactRequest->validated(), $image);
 
             return response()->json(null, 204);
-        }catch (EmailAlreadyExistsException $e) {
+        } catch (EmailAlreadyExistsException $e) {
             return response()->json(['message' => $e->getMessage()], 409);
         } catch (\Exception $e) {
             return $this->apiError($e);
