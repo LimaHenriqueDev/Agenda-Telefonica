@@ -4,6 +4,7 @@ import {
     helpers,
     minLength,
     maxLength,
+    sameAs,
 } from "@vuelidate/validators";
 
 export default {
@@ -19,4 +20,6 @@ export default {
             `Este campo deve ter no máximo ${max} caracteres`,
             maxLength(max)
         ),
+    sameAs: (passwordRef) =>
+        helpers.withMessage("As senhas devem coincidir", sameAs(passwordRef)),
 };

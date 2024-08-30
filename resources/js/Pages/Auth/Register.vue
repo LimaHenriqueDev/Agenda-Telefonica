@@ -31,8 +31,8 @@
                         id="email"
                         type="email"
                         :error="
-                            v$.password.$error
-                                ? v$.password.$errors[0].$message
+                            v$.email.$error
+                                ? v$.email.$errors[0].$message
                                 : errors['email']
                                 ? errors['email'][0]
                                 : ''
@@ -47,6 +47,18 @@
                         :error="
                             v$.password.$error
                                 ? v$.password.$errors[0].$message
+                                : ''
+                        "
+                    />
+                    <AppInput
+                        v-model="payload.password_confirmation"
+                        label="Confirmar senha"
+                        placeholder="********"
+                        id="password_confirmation"
+                        type="password"
+                        :error="
+                            v$.password_confirmation.$error
+                                ? v$.password_confirmation.$errors[0].$message
                                 : ''
                         "
                     />
@@ -90,11 +102,16 @@ const rules = computed(() => ({
         required: validator.required,
         minLength: validator.minLength(6),
     },
+    password_confirmation: {
+        required: validator.required,
+        sameAs: validator.sameAs(payload.value.password),
+    },
 }));
 const payload = ref({
     name: "",
     email: "",
     password: "",
+    password_confirmation: "",
 });
 
 const v$ = useVuelidate(rules, payload);
