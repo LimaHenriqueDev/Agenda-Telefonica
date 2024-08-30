@@ -18,17 +18,22 @@
                 <form>
                     <AppInput
                         v-model="payload.email"
-                        label="Email"
+                        label="Email *"
                         placeholder="seuemail@gmail.com"
                         id="email"
                         type="email"
                         :error="
-                            v$.email.$error ? v$.email.$errors[0].$message : ''
+                            v$.email.$error
+                                ? v$.email.$errors[0].$message
+                                : errors['email']
+                                ? errors['email'][0]
+                                : ''
                         "
+                        @blur="v$.email.$touch"
                     />
                     <AppInput
                         v-model="payload.password"
-                        label="Senha"
+                        label="Senha *"
                         placeholder="********"
                         id="password"
                         type="password"
@@ -39,6 +44,7 @@
                                 ? errors['password'][0]
                                 : ''
                         "
+                        @blur="v$.password.$touch"
                     />
                     <div class="text-center">
                         <button
@@ -80,6 +86,7 @@ const rules = computed(() => ({
     email: {
         required: validator.required,
         maxLength: validator.maxLength(100),
+        email: validator.email,
     },
     password: {
         required: validator.required,

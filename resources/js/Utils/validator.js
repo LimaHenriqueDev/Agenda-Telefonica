@@ -22,4 +22,9 @@ export default {
         ),
     sameAs: (passwordRef) =>
         helpers.withMessage("As senhas devem coincidir", sameAs(passwordRef)),
+    minDigits: (min) =>
+        helpers.withMessage(
+            `Este campo deve ter no mínimo ${min} dígitos`,
+            minLength(min)
+        ),
 };

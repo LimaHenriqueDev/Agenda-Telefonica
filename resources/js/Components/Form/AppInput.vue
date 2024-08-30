@@ -9,6 +9,7 @@
                 @input="
                     (event) => emits('update:modelValue', event.target.value)
                 "
+                @blur="() => emits('blur')"
                 class="form-control"
                 :class="{
                     'is-invalid': props.error,
@@ -29,5 +30,5 @@ const props = defineProps({
     modelValue: { type: [String, Number, null], required: false },
 });
 
-const emits = defineEmits(["update:modelValue"]);
+const emits = defineEmits(["update:modelValue", "blur"]);
 </script>

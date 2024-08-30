@@ -16,17 +16,18 @@
                 <form>
                     <AppInput
                         v-model="payload.name"
-                        label="Nome"
+                        label="Nome *"
                         placeholder="Nome de usuário"
                         id="name"
                         type="name"
                         :error="
                             v$.name.$error ? v$.name.$errors[0].$message : ''
                         "
+                        @blur="v$.name.$touch"
                     />
                     <AppInput
                         v-model="payload.email"
-                        label="Email"
+                        label="Email *"
                         placeholder="seuemail@gmail.com"
                         id="email"
                         type="email"
@@ -37,10 +38,11 @@
                                 ? errors['email'][0]
                                 : ''
                         "
+                        @blur="v$.email.$touch"
                     />
                     <AppInput
                         v-model="payload.password"
-                        label="Senha"
+                        label="Senha *"
                         placeholder="********"
                         id="password"
                         type="password"
@@ -49,10 +51,11 @@
                                 ? v$.password.$errors[0].$message
                                 : ''
                         "
+                        @blur="v$.password.$touch"
                     />
                     <AppInput
                         v-model="payload.password_confirmation"
-                        label="Confirmar senha"
+                        label="Confirmar senha *"
                         placeholder="********"
                         id="password_confirmation"
                         type="password"
@@ -61,10 +64,11 @@
                                 ? v$.password_confirmation.$errors[0].$message
                                 : ''
                         "
+                        @blur="v$.password_confirmation.$touch"
                     />
-
                     <div class="text-center">
                         <button
+                            :disabled="v$.$invalid || formSubmitted"
                             class="register-btn btn btn-primary btn rounded mt-3 mb-4 w-100 shadow"
                             @click.prevent="() => submitForm()"
                         >
@@ -103,9 +107,10 @@ const rules = computed(() => ({
     },
     password_confirmation: {
         required: validator.required,
-        sameAs: validator.sameAs(payload.value.password),
+        sameAs: validator.sameAs(computed(() => payload.value.password)),
     },
 }));
+
 const payload = ref({
     name: "",
     email: "",
@@ -113,10 +118,13 @@ const payload = ref({
     password_confirmation: "",
 });
 
+const formSubmitted = ref(false);
+
 const v$ = useVuelidate(rules, payload);
 
 async function submitForm() {
     try {
+        formSubmitted.value = true;
         await v$.value.$validate();
         if (v$.value.$invalid) {
             return;
@@ -125,6 +133,7 @@ async function submitForm() {
         toast.success("Cadastro realizado com sucesso!");
         setTimeout(() => router.push({ name: "Login" }), 1500);
     } catch (error) {
+        formSubmitted.value = false;
         if (error instanceof AxiosError) {
             if (error.response.status === 422) {
                 errors.value = error.response.data.errors;

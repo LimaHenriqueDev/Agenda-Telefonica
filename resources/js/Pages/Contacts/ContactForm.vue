@@ -16,6 +16,7 @@
                         :error="
                             v$.name.$error ? v$.name.$errors[0].$message : ''
                         "
+                        @blur="v$.name.$touch"
                     />
 
                     <AppInput
@@ -31,6 +32,7 @@
                                 ? errors['email'][0]
                                 : ''
                         "
+                        @blur="v$.email.$touch"
                     />
 
                     <AppInput
@@ -41,8 +43,13 @@
                         type="tel"
                         v-mask="'(##) #####-####'"
                         :error="
-                            v$.phone.$error ? v$.phone.$errors[0].$message : ''
+                            v$.phone.$error
+                                ? v$.phone.$errors[0].$message
+                                : errors['phone']
+                                ? errors['phone'][0]
+                                : ''
                         "
+                        @blur="v$.phone.$touch"
                     />
 
                     <label
@@ -84,7 +91,7 @@
                         <button
                             type="submit"
                             class="btn btn-primary"
-                            :disabled="buttonDisable"
+                            :disabled="v$.$invalid || formSubmitted"
                         >
                             {{ title }}
                         </button>
@@ -116,6 +123,7 @@ const rules = computed(() => ({
     },
     phone: {
         required: validator.required,
+        minDigits: validator.minDigits(15),
     },
 }));
 
@@ -138,9 +146,8 @@ const contact = ref([]);
 const formSubmitted = ref(false);
 const errors = ref([]);
 async function submitForm() {
-    formSubmitted.value = true;
-
     try {
+        formSubmitted.value = true;
         await v$.value.$validate();
         if (v$.value.$invalid) {
             return;
@@ -156,6 +163,7 @@ async function submitForm() {
         }
     } catch (error) {
         if (error instanceof AxiosError) {
+            formSubmitted.value = false;
             if (error.response.status === 422) {
                 errors.value = error.response.data.errors;
                 return;
