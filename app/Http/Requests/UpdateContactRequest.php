@@ -23,11 +23,11 @@ class UpdateContactRequest extends FormRequest
     {
         return [
 
-            'name' => 'sometimes|string|max:255',
-            'phone' => 'sometimes|string|max:20',
-            'email' => 'sometimes|email|max:20',
-            'image' => 'sometimes'
-            
+            'name' => ['sometimes', 'string', 'max:255'],
+            'phone' => ['sometimes', 'string', 'max:20'],
+            'email' => ['sometimes', 'email', 'max:150'],
+            'image' => ['sometimes']
+
         ];
     }
 }

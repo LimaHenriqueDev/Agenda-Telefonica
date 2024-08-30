@@ -21,12 +21,4 @@ class UserService
 
     return  $this->userRepository->create($userData);
   }
-
-  public function checkIfUserEmailExists($email){
-    return  $this->userRepository->checkIfUserEmailExists($email);
-  }
-  
-  public function checkIfUserNameExists($name){
-    return  $this->userRepository->checkIfUserNameExists($name);
-  }
 }

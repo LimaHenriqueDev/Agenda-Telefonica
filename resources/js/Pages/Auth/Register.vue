@@ -65,7 +65,6 @@
 
                     <div class="text-center">
                         <button
-                            :disabled="v$.$invalid || submitFormCheck"
                             class="register-btn btn btn-primary btn rounded mt-3 mb-4 w-100 shadow"
                             @click.prevent="() => submitForm()"
                         >
@@ -116,11 +115,8 @@ const payload = ref({
 
 const v$ = useVuelidate(rules, payload);
 
-const submitFormCheck = ref(false);
-
 async function submitForm() {
     try {
-        submitFormCheck.value = true;
         await v$.value.$validate();
         if (v$.value.$invalid) {
             return;
@@ -129,7 +125,6 @@ async function submitForm() {
         toast.success("Cadastro realizado com sucesso!");
         setTimeout(() => router.push({ name: "Login" }), 1500);
     } catch (error) {
-        submitFormCheck.value = false;
         if (error instanceof AxiosError) {
             if (error.response.status === 422) {
                 errors.value = error.response.data.errors;

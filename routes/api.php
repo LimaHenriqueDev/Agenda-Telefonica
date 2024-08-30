@@ -18,14 +18,15 @@ use Illuminate\Support\Facades\Auth;
 |
 */
 
+Route::post('login', [AuthController::class, 'login']);
+Route::post('register', [UserController::class, 'store']);
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('contacts', [ContactController::class, 'index']);
     Route::post('contacts', [ContactController::class, 'store']);
     Route::get('contacts/{contact}', [ContactController::class, 'show']);
     Route::put('contacts/{contact}', [ContactController::class, 'update']);
     Route::delete('contacts/{contact}', [ContactController::class, 'destroy']);
-    Route::get('is-loged',[AuthController::class, 'isLoged']);
-    Route::post('logout',[AuthController::class, 'logOut']);
+    Route::get('is-loged', [AuthController::class, 'isLoged']);
+    Route::post('logout', [AuthController::class, 'logOut']);
 });
-Route::post('login', [AuthController::class, 'login']);
-Route::post('register', [UserController::class, 'store']);
